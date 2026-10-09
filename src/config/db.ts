@@ -1,4 +1,8 @@
+import dns from "node:dns";
 import mongoose from "mongoose";
+
+// Resolve MongoDB SRV records via public DNS if local ISP DNS blocks SRV lookups
+dns.setServers(["8.8.8.8", "1.1.1.1"]);
 
 export async function connectDB() {
   const uri = process.env.MONGODB_URI;
