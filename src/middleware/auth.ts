@@ -53,3 +53,27 @@ export function requireAuth(
     });
   }
 }
+
+// Optional auth middleware: populates req.userId if a valid token is present, but allows requests to proceed without one
+export function optionalAuth(
+  req: Request,
+  _res: Response,
+  next: NextFunction,
+) {
+  const header = req.headers.authorization;
+
+  if (header?.startsWith("Bearer ")) {
+    const token = header.slice("Bearer ".length);
+    try {
+      const payload = jwt.verify(
+        token,
+        process.env.JWT_SECRET!,
+      ) as TokenPayload;
+      req.userId = payload.userId;
+    } catch {
+      // Invalid/expired token ignored for optional routes
+    }
+  }
+
+  next();
+}

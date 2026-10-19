@@ -1,19 +1,16 @@
 import { Router, type Request, type Response } from "express";
 import { Item } from "../models/Item";
-import { requireAuth } from "../middleware/auth";
+import { requireAuth, optionalAuth } from "../middleware/auth";
 import type { NewItemBody } from "../types/index";
 
 export const itemRouter = Router();
-
-// Protect all routes in this router with JWT auth middleware
-itemRouter.use(requireAuth);
 
 interface IdParam {
   id: string;
 }
 
-// 1. GET /api/items -- list items. If ?mine=true, filter by reporterId. Otherwise return all items.
-itemRouter.get("/", async (req: Request, res: Response) => {
+// 1. GET /api/items -- list items. If ?mine=true and authenticated, filter by reporterId. Otherwise return all items.
+itemRouter.get("/", optionalAuth, async (req: Request, res: Response) => {
   const filter: Record<string, unknown> = {};
 
   if (req.query.mine === "true" && req.userId) {
@@ -33,7 +30,8 @@ itemRouter.get("/", async (req: Request, res: Response) => {
 // 2. GET /api/items/:id -- read a single item by ID
 itemRouter.get(
   "/:id",
-  async (req: Request<IdParam>, res: Response) => {
+  optionalAuth,
+  async (req: Request, res: Response) => {
     const item = await Item.findById(req.params.id);
 
     if (!item) {
@@ -45,11 +43,12 @@ itemRouter.get(
   },
 );
 
-// 3. POST /api/items -- create a new lost/found item report
+// 3. POST /api/items -- create a new lost/found item report (requires auth)
 itemRouter.post(
   "/",
+  requireAuth,
   async (
-    req: Request<unknown, unknown, NewItemBody>,
+    req: Request,
     res: Response,
   ) => {
     const item = await Item.create({
@@ -62,11 +61,12 @@ itemRouter.post(
   },
 );
 
-// 4. PATCH /api/items/:id -- update an item belonging to the authenticated user
+// 4. PATCH /api/items/:id -- update an item belonging to the authenticated user (requires auth)
 itemRouter.patch(
   "/:id",
+  requireAuth,
   async (
-    req: Request<IdParam, unknown, Partial<NewItemBody>>,
+    req: Request,
     res: Response,
   ) => {
     const item = await Item.findOneAndUpdate(
@@ -86,10 +86,11 @@ itemRouter.patch(
   },
 );
 
-// 5. DELETE /api/items/:id -- delete an item belonging to the authenticated user
+// 5. DELETE /api/items/:id -- delete an item belonging to the authenticated user (requires auth)
 itemRouter.delete(
   "/:id",
-  async (req: Request<IdParam>, res: Response) => {
+  requireAuth,
+  async (req: Request, res: Response) => {
     const item = await Item.findOneAndDelete({
       _id: req.params.id,
       reporterId: req.userId,

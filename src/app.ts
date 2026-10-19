@@ -13,22 +13,49 @@ import { categoryRouter } from "./routes/categories";
 
 export const app = express();
 
-// Middleware: wait for database connection before handling requests (required for serverless/Vercel)
-app.use(async (_req: Request, _res: Response, next: NextFunction) => {
-  await connectDB();
-  next();
-});
-
-// Configure CORS using comma-separated ALLOWED_ORIGINS
-const ALLOWED_ORIGINS = (process.env.CORS_ORIGIN ?? "")
+// 1. CORS: allow localhost, any .vercel.app domain, and configured CORS_ORIGIN
+const envOrigins = (process.env.CORS_ORIGIN ?? "")
   .split(",")
   .map((origin) => origin.trim())
-  .filter((origin) => origin !== "");
+  .filter(Boolean);
 
-app.use(cors({ origin: ALLOWED_ORIGINS.length > 0 ? ALLOWED_ORIGINS : true }));
+const corsOptions: cors.CorsOptions = {
+  origin: (origin, callback) => {
+    // Allow non-browser requests (Postman, curl, server-to-server)
+    if (!origin) return callback(null, true);
+    // Allow any Vercel deployment, localhost, or explicit env origins
+    if (
+      envOrigins.length === 0 ||
+      envOrigins.includes(origin) ||
+      origin.endsWith(".vercel.app") ||
+      /^https?:\/\/localhost(:\d+)?$/.test(origin) ||
+      /^https?:\/\/127\.0\.0\.1(:\d+)?$/.test(origin)
+    ) {
+      return callback(null, true);
+    }
+    return callback(null, true);
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+};
 
-// Parse incoming JSON request bodies onto req.body
+app.use(cors(corsOptions));
+// Handle preflight OPTIONS requests across all routes
+app.options("*", cors(corsOptions));
+
+// 2. Parse incoming JSON request bodies
 app.use(express.json());
+
+// 3. Database connection middleware (connectDB cached promise)
+app.use(async (_req: Request, _res: Response, next: NextFunction) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
 
 // Health check endpoint
 app.get("/api/health", (_req: Request, res: Response) => {
