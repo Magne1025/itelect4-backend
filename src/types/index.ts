@@ -23,6 +23,13 @@ export interface Item {
   reportedAt: Date;
 }
 
+// Reference resource: Category (for app dropdown / filtering)
+export interface Category {
+  code: string;
+  name: string;
+  description: string;
+}
+
 // ---------------------------------------------------------------------
 // Derived types for what the database stores and what the API accepts
 // ---------------------------------------------------------------------
@@ -41,3 +48,6 @@ export type NewItemBody = Pick<
   Item,
   "title" | "category" | "location" | "description" | "contactNumber" | "status" | "reward"
 >;
+
+// CategoryDoc as a Pick mapped type
+export type CategoryDoc = Pick<Category, "code" | "name" | "description">;
