@@ -12,23 +12,29 @@ interface IdParam {
   id: string;
 }
 
-// 1. GET /api/items -- list all items belonging to the authenticated user
+// 1. GET /api/items -- list items. If ?mine=true, filter by reporterId. Otherwise return all items.
 itemRouter.get("/", async (req: Request, res: Response) => {
-  const items = await Item.find({
-    reporterId: req.userId,
-  }).sort({ reportedAt: -1 });
+  const filter: Record<string, unknown> = {};
 
+  if (req.query.mine === "true" && req.userId) {
+    filter.reporterId = req.userId;
+  }
+  if (req.query.status) {
+    filter.status = req.query.status;
+  }
+  if (req.query.category) {
+    filter.category = req.query.category;
+  }
+
+  const items = await Item.find(filter).sort({ reportedAt: -1 });
   res.json(items);
 });
 
-// 2. GET /api/items/:id -- read a single item by ID belonging to the authenticated user
+// 2. GET /api/items/:id -- read a single item by ID
 itemRouter.get(
   "/:id",
   async (req: Request<IdParam>, res: Response) => {
-    const item = await Item.findOne({
-      _id: req.params.id,
-      reporterId: req.userId,
-    });
+    const item = await Item.findById(req.params.id);
 
     if (!item) {
       res.status(404).json({ message: "No item with that id" });

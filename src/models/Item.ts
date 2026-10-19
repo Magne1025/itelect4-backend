@@ -21,9 +21,9 @@ const itemSchema = new Schema<ItemDoc>({
     type: String,
     required: [true, "category is required"],
     enum: {
-      values: ["electronics", "documents", "accessories", "clothing", "other"],
+      values: ["electronics", "documents", "accessories", "clothing", "keys", "other"],
       message:
-        "category must be one of: electronics, documents, accessories, clothing, other",
+        "category must be one of: electronics, documents, accessories, clothing, keys, other",
     },
     trim: true,
   },
@@ -62,6 +62,11 @@ const itemSchema = new Schema<ItemDoc>({
     type: Number,
     min: [0, "reward cannot be negative"],
     max: [100000, "reward cannot exceed 100000"],
+  },
+
+  imageUrl: {
+    type: String,
+    trim: true,
   },
 
   reportedAt: {
