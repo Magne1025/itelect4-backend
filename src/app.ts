@@ -1,3 +1,4 @@
+import "dotenv/config";
 import express, {
   type Request,
   type Response,
@@ -5,13 +6,26 @@ import express, {
 } from "express";
 import cors from "cors";
 import mongoose from "mongoose";
+import { connectDB } from "./config/db";
 import { authRouter } from "./routes/auth";
 import { itemRouter } from "./routes/items";
+import { categoryRouter } from "./routes/categories";
 
 export const app = express();
 
-// Enable Cross-Origin Resource Sharing
-app.use(cors());
+// Middleware: wait for database connection before handling requests (required for serverless/Vercel)
+app.use(async (_req: Request, _res: Response, next: NextFunction) => {
+  await connectDB();
+  next();
+});
+
+// Configure CORS using comma-separated ALLOWED_ORIGINS
+const ALLOWED_ORIGINS = (process.env.CORS_ORIGIN ?? "")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter((origin) => origin !== "");
+
+app.use(cors({ origin: ALLOWED_ORIGINS.length > 0 ? ALLOWED_ORIGINS : true }));
 
 // Parse incoming JSON request bodies onto req.body
 app.use(express.json());
@@ -23,6 +37,7 @@ app.get("/api/health", (_req: Request, res: Response) => {
 
 // Mount application routers
 app.use("/api/auth", authRouter);
+app.use("/api/categories", categoryRouter);
 app.use("/api/items", itemRouter);
 
 // 404 Catch-all handler for unmatched routes
@@ -56,3 +71,5 @@ app.use(
     res.status(500).json({ message: "Something went wrong" });
   },
 );
+
+export default app;
