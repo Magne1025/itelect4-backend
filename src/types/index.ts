@@ -14,12 +14,13 @@ export interface Item {
   id: number;
   reporterId: number;
   title: string;
-  category: "electronics" | "documents" | "accessories" | "clothing" | "other";
+  category: "electronics" | "documents" | "accessories" | "clothing" | "keys" | "other";
   location: string;
   description: string;
   contactNumber: string;
   status: "lost" | "found" | "claimed";
   reward?: number;
+  imageUrl?: string;
   reportedAt: Date;
 }
 
@@ -46,7 +47,7 @@ export type ItemDoc = Omit<Item, "id" | "reporterId"> & {
 // The body sent when creating a new lost/found item report
 export type NewItemBody = Pick<
   Item,
-  "title" | "category" | "location" | "description" | "contactNumber" | "status" | "reward"
+  "title" | "category" | "location" | "description" | "contactNumber" | "status" | "reward" | "imageUrl"
 >;
 
 // CategoryDoc as a Pick mapped type
