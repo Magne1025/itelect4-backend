@@ -73,3 +73,6 @@ app.use(
 );
 
 export default app;
+// Support CommonJS export expected by Vercel serverless loader
+module.exports = app;
+module.exports.default = app;
