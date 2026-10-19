@@ -41,8 +41,6 @@ const corsOptions: cors.CorsOptions = {
 };
 
 app.use(cors(corsOptions));
-// Handle preflight OPTIONS requests across all routes
-app.options("*", cors(corsOptions));
 
 // 2. Parse incoming JSON request bodies
 app.use(express.json());
@@ -103,3 +101,4 @@ export default app;
 // Support CommonJS export expected by Vercel serverless loader
 module.exports = app;
 module.exports.default = app;
+module.exports.app = app;
