@@ -35,6 +35,7 @@ Secure REST API backend for the Campus Lost and Found System, powered by Node.js
 | `POST` | `/api/items` | Private (JWT) | Report a lost or found item |
 | `PATCH`| `/api/items/:id` | Private (JWT) | Update status or details of reported item |
 | `DELETE`| `/api/items/:id`| Private (JWT) | Delete an item report |
+| `POST` | `/api/ai` | Private (JWT) | AI review & feedback via Google Gemini (`gemini-flash-latest`) |
 
 ---
 
@@ -47,6 +48,7 @@ PORT=4000
 MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.0ysryas.mongodb.net/lostandfound?retryWrites=true&w=majority
 JWT_SECRET=your_jwt_secret_key_here
 CORS_ORIGIN=https://itelect4-project-green.vercel.app,http://localhost:5173
+GEMINI_API_KEY=your_gemini_api_key_here
 ```
 
 ---
