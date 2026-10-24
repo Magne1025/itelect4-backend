@@ -44,6 +44,15 @@ const corsOptions: cors.CorsOptions = {
 
 app.use(cors(corsOptions));
 
+// Handle CORS preflight OPTIONS requests immediately for all routes
+app.use((req: Request, res: Response, next: NextFunction) => {
+  if (req.method === "OPTIONS") {
+    res.sendStatus(204);
+    return;
+  }
+  next();
+});
+
 // 2. Parse incoming JSON request bodies
 app.use(express.json());
 
