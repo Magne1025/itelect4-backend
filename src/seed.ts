@@ -1,6 +1,5 @@
 import "dotenv/config";
 import mongoose from "mongoose";
-import bcrypt from "bcryptjs";
 import { connectDB } from "./config/db";
 import { Category } from "./models/Category";
 import { User } from "./models/User";
@@ -18,37 +17,35 @@ async function seed() {
   console.log(`✓ Seeded ${CATEGORIES.length} categories`);
 
   // 2. Seed Users
-  const passwordHash = await bcrypt.hash("password123", 10);
-  const adminPasswordHash = await bcrypt.hash("adminpassword123", 10);
-
+  // Pass plain passwords: the pre("save") hook in User.ts will hash them automatically once.
   const usersToSeed = [
     {
       name: "Campus Administrator",
       email: "admin@campus.edu",
       role: "admin",
       isActive: true,
-      password: adminPasswordHash,
+      password: "adminpassword123",
     },
     {
       name: "Jarmagne Villamin",
       email: "student@dlsl.edu.ph",
       role: "student",
       isActive: true,
-      password: passwordHash,
+      password: "password123",
     },
     {
       name: "Maria Santos",
       email: "maria.santos@dlsl.edu.ph",
       role: "student",
       isActive: true,
-      password: passwordHash,
+      password: "password123",
     },
     {
       name: "Juan Dela Cruz",
       email: "juan.delacruz@dlsl.edu.ph",
       role: "student",
       isActive: true,
-      password: passwordHash,
+      password: "password123",
     },
   ];
 
