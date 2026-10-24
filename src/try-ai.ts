@@ -9,9 +9,10 @@ import { reviewProject } from "./ai/gemini";
 // review, the key, the model name and the schema all work.
 async function tryAi() {
   const review = await reviewProject(
-    "A Campus Lost & Found web application in React and TypeScript. Students " +
-      "log in, report lost or found items with categories, locations, and descriptions, " +
-      "and submit claims. The API is Express and MongoDB, deployed on Vercel.",
+    "A Campus Lost & Found web application in React and TypeScript with Express and MongoDB, deployed on Vercel " +
+      "at https://itelect4-project-green.vercel.app and https://itelect4-backend-amber.vercel.app. Students log in with JWT, " +
+      "report lost or found items with categories, locations, and descriptions, and submit claims. Administrators review and " +
+      "approve or reject ownership claims through an admin dashboard with real-time statistics.",
   );
   console.log(JSON.stringify(review, null, 2));
 }
