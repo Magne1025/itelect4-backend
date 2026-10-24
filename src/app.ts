@@ -11,6 +11,7 @@ import { authRouter } from "./routes/auth";
 import { itemRouter } from "./routes/items";
 import { categoryRouter } from "./routes/categories";
 import { aiRouter } from "./routes/ai";
+import { userRouter } from "./routes/users";
 
 export const app = express();
 
@@ -65,6 +66,7 @@ app.get("/api/health", (_req: Request, res: Response) => {
 app.use("/api/auth", authRouter);
 app.use("/api/categories", categoryRouter);
 app.use("/api/items", itemRouter);
+app.use("/api/users", userRouter);
 app.use("/api/ai", aiRouter);
 
 // 404 Catch-all handler for unmatched routes
