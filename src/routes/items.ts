@@ -1,5 +1,6 @@
 import { Router, type Request, type Response } from "express";
 import { Item } from "../models/Item";
+import { User } from "../models/User";
 import { requireAuth, optionalAuth } from "../middleware/auth";
 import type { NewItemBody } from "../types/index";
 
@@ -61,7 +62,7 @@ itemRouter.post(
   },
 );
 
-// 4. PATCH /api/items/:id -- update an item belonging to the authenticated user (requires auth)
+// 4. PATCH /api/items/:id -- update an item (allowed for reporter OR admin)
 itemRouter.patch(
   "/:id",
   requireAuth,
@@ -69,8 +70,17 @@ itemRouter.patch(
     req: Request,
     res: Response,
   ) => {
+    // Check if user is an admin
+    const currentUser = await User.findById(req.userId);
+    const isAdmin = currentUser?.role === "admin";
+
+    // Admins can update any item; non-admins can only update their own items
+    const query = isAdmin
+      ? { _id: req.params.id }
+      : { _id: req.params.id, reporterId: req.userId };
+
     const item = await Item.findOneAndUpdate(
-      { _id: req.params.id, reporterId: req.userId },
+      query,
       req.body,
       // new: return the document after modification
       // runValidators: ensure Mongoose schema rules are enforced during update
