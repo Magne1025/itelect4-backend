@@ -67,7 +67,8 @@ authRouter.post(
     }
 
     const payload: TokenPayload = { userId: String(user._id) };
-    const token = jwt.sign(payload, process.env.JWT_SECRET!, {
+    const secret = process.env.JWT_SECRET || "lost-and-found-super-secret-jwt-key-2026";
+    const token = jwt.sign(payload, secret, {
       expiresIn: "2h",
     });
 

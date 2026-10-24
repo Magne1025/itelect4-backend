@@ -36,15 +36,13 @@ export function requireAuth(
   }
 
   const token = header.slice("Bearer ".length);
+  const secret = process.env.JWT_SECRET || "lost-and-found-super-secret-jwt-key-2026";
 
   try {
     // verify does two things: checks the signature was made with our
     // secret, and checks the token has not expired. Either failure
     // throws, which is why this is inside a try.
-    const payload = jwt.verify(
-      token,
-      process.env.JWT_SECRET!,
-    ) as TokenPayload;
+    const payload = jwt.verify(token, secret) as TokenPayload;
     req.userId = payload.userId;
     next();
   } catch {
@@ -64,11 +62,9 @@ export function optionalAuth(
 
   if (header?.startsWith("Bearer ")) {
     const token = header.slice("Bearer ".length);
+    const secret = process.env.JWT_SECRET || "lost-and-found-super-secret-jwt-key-2026";
     try {
-      const payload = jwt.verify(
-        token,
-        process.env.JWT_SECRET!,
-      ) as TokenPayload;
+      const payload = jwt.verify(token, secret) as TokenPayload;
       req.userId = payload.userId;
     } catch {
       // Invalid/expired token ignored for optional routes
