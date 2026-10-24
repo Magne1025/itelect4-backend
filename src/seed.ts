@@ -17,8 +17,15 @@ async function seed() {
   console.log(`✓ Seeded ${CATEGORIES.length} categories`);
 
   // 2. Seed Users
-  // Pass plain passwords: the pre("save") hook in User.ts will hash them automatically once.
-  const usersToSeed = [
+  interface SeedUser {
+    name: string;
+    email: string;
+    role: "admin" | "student" | "instructor";
+    isActive: boolean;
+    password: string;
+  }
+
+  const usersToSeed: SeedUser[] = [
     {
       name: "Campus Administrator",
       email: "admin@campus.edu",
@@ -55,20 +62,32 @@ async function seed() {
     const existing = await User.findOne({ email: u.email });
     if (existing) {
       existing.name = u.name;
-      existing.role = u.role as "student" | "admin" | "instructor";
+      existing.role = u.role;
       existing.isActive = u.isActive;
       existing.password = u.password;
       await existing.save();
       seededUsers[u.email] = existing._id as mongoose.Types.ObjectId;
     } else {
-      const created = await User.create(u);
+      const created = await new User(u).save();
       seededUsers[u.email] = created._id as mongoose.Types.ObjectId;
     }
   }
   console.log(`✓ Seeded ${usersToSeed.length} users (Admin: admin@campus.edu / adminpassword123)`);
 
   // 3. Seed Items
-  const itemsToSeed = [
+  interface SeedItem {
+    reporterId: mongoose.Types.ObjectId;
+    title: string;
+    category: "electronics" | "documents" | "accessories" | "clothing" | "keys" | "other";
+    location: string;
+    description: string;
+    contactNumber: string;
+    status: "lost" | "found" | "claimed";
+    reward?: number;
+    imageUrl?: string;
+  }
+
+  const itemsToSeed: SeedItem[] = [
     {
       reporterId: seededUsers["student@dlsl.edu.ph"],
       title: "MacBook Pro 14-inch Space Gray",
@@ -146,7 +165,7 @@ async function seed() {
   for (const item of itemsToSeed) {
     const existing = await Item.findOne({ title: item.title, location: item.location });
     if (!existing) {
-      await Item.create(item);
+      await new Item(item).save();
     }
   }
   console.log(`✓ Seeded ${itemsToSeed.length} sample items`);
