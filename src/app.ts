@@ -15,37 +15,20 @@ import { userRouter } from "./routes/users";
 
 export const app = express();
 
-// 1. CORS: allow localhost, any .vercel.app domain, and configured CORS_ORIGIN
-const envOrigins = (process.env.CORS_ORIGIN ?? "")
-  .split(",")
-  .map((origin) => origin.trim())
-  .filter(Boolean);
-
-const corsOptions: cors.CorsOptions = {
-  origin: (origin, callback) => {
-    // Allow non-browser requests (Postman, curl, server-to-server)
-    if (!origin) return callback(null, true);
-    // Allow any Vercel deployment, localhost, or explicit env origins
-    if (
-      envOrigins.length === 0 ||
-      envOrigins.includes(origin) ||
-      origin.endsWith(".vercel.app") ||
-      /^https?:\/\/localhost(:\d+)?$/.test(origin) ||
-      /^https?:\/\/127\.0\.0\.1(:\d+)?$/.test(origin)
-    ) {
-      return callback(null, true);
-    }
-    return callback(null, true);
-  },
+// 1. CORS: allow localhost, any .vercel.app domain, and credentials
+app.use(cors({
+  origin: true,
   credentials: true,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
-};
-
-app.use(cors(corsOptions));
+}));
 
 // Handle CORS preflight OPTIONS requests immediately for all routes
 app.use((req: Request, res: Response, next: NextFunction) => {
+  res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.header("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type,Authorization,X-Requested-With");
   if (req.method === "OPTIONS") {
     res.sendStatus(204);
     return;
