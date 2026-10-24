@@ -64,6 +64,7 @@ aiRouter.post("/", async (req: Request, res: Response) => {
       console.error(err);
       res.status(502).json({
         message: "The AI service did not answer properly. Try again.",
+        detail: err instanceof ApiError ? (err.message || `Gemini status ${err.status}`) : err.message,
       });
       return;
     }
