@@ -36,7 +36,7 @@ export function requireAuth(
   }
 
   const token = header.slice("Bearer ".length);
-  const secret = process.env.JWT_SECRET || "lost-and-found-super-secret-jwt-key-2026";
+  const secret = process.env.JWT_SECRET!;
 
   try {
     // verify does two things: checks the signature was made with our
