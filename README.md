@@ -1,6 +1,22 @@
 # Campus Lost & Found — Backend API (ITELECT4)
 
+[![CI](https://github.com/Magne1025/itelect4-backend/actions/workflows/ci.yml/badge.svg)](https://github.com/Magne1025/itelect4-backend/actions/workflows/ci.yml)
+
 Secure REST API backend for the Campus Lost and Found System, powered by Node.js, Express, TypeScript, and MongoDB Atlas. Deployed as serverless functions on Vercel.
+
+## Architecture
+
+```mermaid
+flowchart LR
+  fe["itelect4-project<br/>React + Vite on Vercel"]
+  be["itelect4-backend<br/>Express on Vercel"]
+  db[("MongoDB Atlas")]
+  ai["Gemini API"]
+  fe -- "fetch + Bearer token" --> be
+  be -- "Mongoose" --> db
+  be -- "GEMINI_API_KEY" --> ai
+```
+
 
 ## 🚀 Live Deployments
 
@@ -74,3 +90,13 @@ Build and typecheck:
 ```bash
 npm run build
 ```
+
+Run test suite:
+```bash
+npm test
+```
+
+---
+
+## 🤖 AI-Use Disclosure
+AI coding assistants were utilized during the development of this project for pair programming, code scaffolding, automated testing setup (Vitest and Supertest), CI workflow configuration, and code quality type checking assistance. All generated code and tests have been reviewed, verified, and validated.

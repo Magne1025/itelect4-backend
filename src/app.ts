@@ -94,7 +94,14 @@ app.use(
 );
 
 export default app;
-// Support CommonJS export expected by Vercel serverless loader
-module.exports = app;
-module.exports.default = app;
-module.exports.app = app;
+// Support CommonJS export expected by Vercel serverless loader if running under CJS
+if (typeof module !== "undefined" && module.exports) {
+  try {
+    module.exports = app;
+    module.exports.default = app;
+    module.exports.app = app;
+  } catch {
+    // Ignore in ES module / Vitest environments where module.exports is read-only
+  }
+}
+
